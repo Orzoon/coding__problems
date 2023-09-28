@@ -91,3 +91,108 @@ function productArrayExceptSelf(arr) {
 }
 
 productArrayExceptSelf([1, 2, 3]);
+
+/**********Valid Sudoklu**********/
+const sudokuInput = [
+  ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+  ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+  [".", "9", "8", ".", ".", ".", ".", "6", "."],
+  ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+  ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+  ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+  [".", "6", ".", ".", ".", ".", "2", "8", "."],
+  [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+  [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+];
+
+// brute force way
+function validSudoku__0(sudokuInput) {
+  const sudokuLength = sudokuInput.length;
+
+  // checking the row
+  for (let i = 0; i < sudokuLength; i++) {
+    let rowSet = new Set();
+    const row = sudokuInput[0];
+    for (let j = 0; j < sudokuLength; j++) {
+      if (row[j] !== ".") {
+        if (rowSet.has(row[j])) return false;
+        rowSet.add(row[j]);
+      }
+    }
+    rowSet.clear();
+  }
+
+  // checking the column
+  for (let i = 0; i < sudokuLength; i++) {
+    let columnSet = new Set();
+    for (let j = 0; j < sudokuLength; j++) {
+      if (sudokuInput[j][i] !== ".") {
+        if (columnSet.has(sudokuInput[j][i])) return false;
+        columnSet.add(sudokuInput[j][i]);
+      }
+    }
+    columnSet.clear();
+  }
+
+  // for 3*3 boxes
+  for (let i = 0; i < 3; i++) {
+    // 3 * 3 row
+    for (let j = 0; j < 3; j++) {
+      // 3 * 3 column
+      let indSet = new Set();
+      for (let k = 0; k < sudokuLength; k++) {
+        let n =
+          sudokuInput[Math.floor(k / 3) + i * 3][
+            ((sudokuLength + k) % 3) + j * 3
+          ];
+        if (n !== ".") {
+          if (indSet.has(n)) return false;
+          indSet.add(n);
+        }
+      }
+
+      indSet.clear();
+    }
+  }
+}
+
+// refined in one main loop
+function validSudoku__1(sudokuInput) {
+  // Sets var
+  let rowSet = new Set();
+  let columnSet = new Set();
+  let boxSet = new Set();
+
+  for (let i = 0; i < sudokuInput.length; i++) {
+    //looping through rows
+    for (let j = 0; j < sudokuInput.length; j++) {
+      // row
+      const rowValue = sudokuInput[i][j];
+      if (rowValue !== ".") {
+        if (rowSet.has(rowValue)) return false;
+        rowSet.add(rowValue);
+      }
+
+      let columnValue = sudokuInput[j][i];
+      if (columnValue !== ".") {
+        if (columnSet.has(columnValue)) return false;
+        columnSet.add(columnValue);
+      }
+
+      //ind boxes
+      const boxvalue =
+        sudokuInput[3 * Math.floor(i / 3) + Math.floor(j / 3)][
+          ((i * 3) % 9) + (j % 3)
+        ];
+      if (boxvalue !== ".") {
+        if (boxSet.has(boxvalue)) return false;
+        boxSet.add(boxvalue);
+      }
+    }
+    rowSet.clear();
+    columnSet.clear();
+    boxSet.clear();
+  }
+
+  return true;
+}
